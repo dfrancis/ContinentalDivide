@@ -91,11 +91,54 @@ public class ContinentMap extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+
+        int numCols = (int) Math.sqrt(map.length);
+        int numRows = numCols;
+        Paint paint = new Paint();
+        int highPoint = 0;
+        for (int idx = 0; idx < map.length; ++idx) {
+            if (map[idx].height > highPoint) {
+                highPoint = map[idx].height;
+            }
+        }
+
+        Paint textPaint = new Paint();
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTextSize(48);
+        int cellWidth = canvas.getWidth()/numCols;
+        int cellHeight = canvas.getWidth()/numRows;
+        for (int idx = 0; idx < map.length; ++idx) {
+            int col = idx % numCols;
+            int row = idx / numCols;
+            int left = col * cellWidth;
+            int top = row * cellHeight;
+            int right = left + cellWidth;
+            int bottom = top + cellHeight;
+            if (highPoint != 0) {
+                // paint.setARGB(255, map[idx].height * 128 / highPoint, map[idx].height * 128 / highPoint, map[idx].height * 128 / highPoint);
+                if (map[idx].flowsNW) {
+                    paint.setARGB(255, 0, 255 - map[idx].height*128 /highPoint, 0);
+                } else if (map[idx].flowsSE) {
+                    paint.setARGB(255, 0, 0,255 - map[idx].height*128 /highPoint);
+                } else {
+                    paint.setARGB(255, 255 - map[idx].height*128 /highPoint, 0,0);
+                }
+                textPaint.setARGB(255, (map[idx].height * 128 / highPoint + 128)%255,  (map[idx].height * 128 / highPoint + 128)%255,  (map[idx].height * 128 / highPoint + 128)%255);
+            } else {
+                if (map[idx].flowsNW) {
+                    paint.setARGB(255, 0, 245, 0);
+                } else if (map[idx].flowsSE) {
+                    paint.setARGB(255, 0, 0,245);
+                } else {
+                    paint.setARGB(255, 245, 0,0);
+                }
+                // paint.setARGB(255, 0, 0, 0);
+                textPaint.setARGB(255, 255, 255, 255);
+            }
+            canvas.drawRect(left, top, right, bottom, paint);
+            canvas.drawText(Integer.toString(map[idx].height), left + cellWidth/2, top + cellHeight/2, textPaint);
+        }
+        invalidate();
     }
 
     public void buildUpContinentalDivide(boolean oneStep) {
